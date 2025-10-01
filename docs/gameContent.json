@@ -120,12 +120,12 @@
             "imageAlt": "cylinder"
           },
           { 
-            "a": "rectangular prism", 
+            "a": "Cuboid", 
             "image": "images/36.png",
             "imageAlt": "rectangular prism"
           },
           { 
-            "a": "triangular prism", 
+            "a": "Prism", 
             "image": "images/37.png",
             "imageAlt": "triangular prism"
           },

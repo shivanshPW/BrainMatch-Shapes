@@ -50,7 +50,7 @@
         "timer": 60,
         "pairs": [
           { 
-            "a": "right-angled triangle", 
+            "a": "heptagon", 
             "image": "images/21.png",
             "imageAlt": "right-angled triangle"
           },

@@ -50,22 +50,22 @@
         "timer": 60,
         "pairs": [
           { 
-            "a": "right-angled triangle", 
+            "a": "heptagon", 
             "image": "images/21.png",
             "imageAlt": "right-angled triangle"
           },
           { 
-            "a": "parallelogram", 
+            "a": "ellipse", 
             "image": "images/22.png",
             "imageAlt": "parallelogram"
           },
           { 
-            "a": "an octagon", 
+            "a": "octagon", 
             "image": "images/23.png",
             "imageAlt": "An octagon"
           },
           { 
-            "a": "an oval", 
+            "a": "oval", 
             "image": "images/24.png",
             "imageAlt": "An oval"
           },

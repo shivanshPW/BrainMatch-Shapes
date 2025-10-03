@@ -47,7 +47,6 @@
         ]
       },
       "level2": {
-        "timer": 60,
         "pairs": [
           { 
             "a": "heptagon", 
@@ -92,7 +91,6 @@
         ]
       },
       "level3": {
-        "timer": 60,
         "pairs": [
           { 
             "a": "sphere", 

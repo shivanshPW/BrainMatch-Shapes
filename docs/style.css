@@ -188,11 +188,13 @@ h1 {
 .card .front-face { 
     background-image: url('card(normal).png'); 
     transform: rotateY(180deg); 
-    font-size: 1.2em; 
+    font-size: 0.9em; 
     color: #333; 
     padding: 5px; 
     font-weight: bold; 
-    text-align: center; 
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 .card .front-face img {
     max-width: 90%;

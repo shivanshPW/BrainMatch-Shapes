@@ -40,6 +40,10 @@ const mainMenuButton = document.getElementById("main-menu-button");
 
 const turnsLabel = document.getElementById("turns-label");
 
+// START: Added Peek Timer element
+const peekTimer = document.querySelector(".peek-timer");
+// END: Added Peek Timer element
+
 // --- Sound Elements ---
 const sounds = {
   correct: document.getElementById("correct-sound"),
@@ -305,21 +309,6 @@ function handleIncorrectMatch() {
   }, 1200);
 }
 
-// function handleIncorrectMatch() {
-//     const [first, second] = gameState.flippedCards;
-//     // Only play sound if the audio element exists
-//     if (sounds.incorrect) {
-//         sounds.incorrect.play().catch(e => {});
-//     }
-//     if (navigator.vibrate) navigator.vibrate(200);
-//     setTimeout(() => { first.classList.add('shake'); second.classList.add('shake'); }, 200);
-//     setTimeout(() => {
-//         first.classList.remove('flipped', 'shake'); second.classList.remove('flipped', 'shake');
-//         resetTurnState();
-//         if (gameState.gameMode === 'reflex') { setTimeout(triggerNextReflexChallenge, 500); }
-//     }, 1200);
-// }
-
 function resetTurnState() {
   if (gameState.reflexCard)
     gameState.reflexCard.classList.remove("reflex-active");
@@ -373,27 +362,63 @@ function handleReflexTimeout() {
 }
 
 // --- Game Flow & Screen Management ---
+// START: Replaced peekAtStart with advanced version
 function peekAtStart(duration, callback) {
-  gameState.lockBoard = true;
-  const cards = document.querySelectorAll(".card");
-  const flipOpenDelay = 100;
-  const flipAnimationTime = 600;
+    gameState.lockBoard = true;
+    const cards = document.querySelectorAll(".card");
+    const blocks = document.querySelectorAll('.timer-block');
+    const flipOpenDelay = 100;
+    const flipAnimationTime = 600;
 
-  setTimeout(() => {
-    cards.forEach((card) => card.classList.add("flipped"));
-  }, flipOpenDelay);
+    let timeLeft = duration / 1000;
 
-  setTimeout(() => {
-    cards.forEach((card) => card.classList.remove("flipped"));
-  }, duration + flipOpenDelay);
+    // Set initial state
+    peekTimer.classList.remove('hidden');
 
-  setTimeout(() => {
-    gameState.lockBoard = false;
-    if (callback) {
-      callback();
-    }
-  }, duration + flipOpenDelay + flipAnimationTime);
+    const timerInterval = setInterval(() => {
+        // Find the correct block to hide.
+        const blockToHide = blocks[timeLeft - 1];
+        if (blockToHide) {
+            blockToHide.classList.add('inactive');
+        }
+
+        timeLeft--;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 1000);
+
+    // Card flipping timeouts
+    setTimeout(() => {
+        cards.forEach((card) => card.classList.add("flipped"));
+    }, flipOpenDelay);
+
+    setTimeout(() => {
+        cards.forEach((card) => card.classList.remove("flipped"));
+    }, duration + flipOpenDelay);
+
+    setTimeout(() => {
+        gameState.lockBoard = false;
+        peekTimer.classList.add('hidden');
+        // Reset blocks for the next round
+        blocks.forEach(block => block.classList.remove('inactive'));
+        if (callback) {
+            callback();
+        }
+    }, duration + flipOpenDelay + flipAnimationTime);
 }
+
+function createPeekTimerBlocks(seconds) {
+    const container = document.querySelector('.timer-blocks-container');
+    container.innerHTML = ''; // Clear previous blocks
+    for (let i = 0; i < seconds; i++) {
+        const block = document.createElement('div');
+        block.classList.add('timer-block');
+        container.appendChild(block);
+    }
+}
+// END: Replaced peekAtStart
 
 function startGame(level) {
   if (!gameContent) {
@@ -418,9 +443,13 @@ function startGame(level) {
   turnsLabel.textContent = "TURNS";
   createBoard(levelData.pairs);
 
-  peekAtStart(5000, () => {
-    if (levelData.timer) startTimer(levelData.timer);
+  // START: Updated to use new peek timer logic
+  const peekDurationSeconds = 5; 
+  createPeekTimerBlocks(peekDurationSeconds); 
+  peekAtStart(peekDurationSeconds * 1000, () => { 
+      if (levelData.timer) startTimer(levelData.timer);
   });
+  // END: Updated to use new peek timer logic
 }
 
 function startReflexMode() {
@@ -441,9 +470,13 @@ function startReflexMode() {
   turnsLabel.textContent = "MOVES";
   createBoard(reflexPairs);
 
-  peekAtStart(2000, () => {
-    setTimeout(triggerNextReflexChallenge, 1000);
+  // START: Updated to use new peek timer logic
+  const peekDurationSeconds = 2;
+  createPeekTimerBlocks(peekDurationSeconds);
+  peekAtStart(peekDurationSeconds * 1000, () => {
+      setTimeout(triggerNextReflexChallenge, 1000);
   });
+  // END: Updated to use new peek timer logic
 }
 
 function handleCampaignWin() {
@@ -455,6 +488,16 @@ function handleCampaignWin() {
   totalCampaignTurns += gameState.turns;
   totalCampaignXP += xp;
   setTimeout(() => {
+    // START: Added confetti
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+    }
+    // END: Added confetti
+
     gameContainer.classList.add("hidden");
     winScreen.classList.remove("hidden");
     winStarsContainer.classList.remove("hidden");
@@ -521,6 +564,16 @@ function handleReflexModeEnd() {
   clearAllTimers();
   const stars = calculateReflexStars(gameState.turns);
   setTimeout(() => {
+    // START: Added confetti
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+    }
+    // END: Added confetti
+    
     gameContainer.classList.add("hidden");
     winScreen.classList.remove("hidden");
     winTitle.textContent = "REFLEX COMPLETE!";
@@ -630,65 +683,6 @@ function showHowToPlay() {
 }
 
 // --- Pause Menu Functions ---
-// function showPauseMenu() {
-//   gameState.isPaused = true;
-//   gameState.lockBoard = true;
-//   pauseMenu.classList.remove("hidden");
-
-//   // Set up tutorial cards in pause menu
-//   const tutorialPair = gameContent.content.science.level1.pairs[0];
-//   const card1Front = document.querySelector(
-//     "#pause-tutorial-card-1 .tutorial-front"
-//   );
-//   const card2Front = document.querySelector(
-//     "#pause-tutorial-card-2 .tutorial-front"
-//   );
-
-//   if (gameContent.gameMode === "textToText") {
-//     card1Front.textContent = tutorialPair.a;
-//     card2Front.textContent = tutorialPair.b;
-//   } else if (gameContent.gameMode === "textToImage") {
-//     card1Front.textContent = tutorialPair.a;
-//     card2Front.innerHTML = `<img src="${tutorialPair.image}" alt="${tutorialPair.imageAlt}">`;
-//   } else if (gameContent.gameMode === "imageToImage") {
-//     card1Front.innerHTML = `<img src="${tutorialPair.firstImage}" alt="${tutorialPair.firstImageAlt}">`;
-//     card2Front.innerHTML = `<img src="${tutorialPair.secondImage}" alt="${tutorialPair.secondImageAlt}">`;
-//   }
-
-//   // Start tutorial animation
-//   const tutorialCards = document.querySelectorAll(".pause-tutorial-card");
-//   let flipIndex = 0;
-
-//   function flipNextCard() {
-//     if (flipIndex < tutorialCards.length) {
-//       tutorialCards[flipIndex].classList.add("flipped");
-
-//       if (flipIndex === 1) {
-//         setTimeout(() => {
-//           tutorialCards.forEach((card) => {
-//             card.classList.add("correct");
-//           });
-//         }, 600);
-//       }
-
-//       flipIndex++;
-//       setTimeout(flipNextCard, 1500);
-//     } else {
-//       setTimeout(() => {
-//         tutorialCards.forEach((card) => {
-//           card.classList.remove("flipped", "correct");
-//         });
-//         flipIndex = 0;
-//         if (gameState.isPaused) {
-//           setTimeout(flipNextCard, 2000);
-//         }
-//       }, 1000);
-//     }
-//   }
-
-//   flipNextCard();
-// }
-
 function showPauseMenu() {
     gameState.isPaused = true;
     gameState.lockBoard = true;

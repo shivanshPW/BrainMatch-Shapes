@@ -88,6 +88,13 @@
                 <span id="timer-container" class="hidden">TIME: <span id="timer">00</span></span>
             </div>
         </header>
+
+        <!-- START: Added Peek Timer -->
+        <div class="peek-timer hidden">
+            <div class="timer-blocks-container"></div>
+        </div>
+        <!-- END: Added Peek Timer -->
+
         <main class="card-grid"></main>
     </div>
 
@@ -142,6 +149,7 @@
     <audio id="campaign-complete-sound" src="campaign-complete.mp3"></audio>
 
     <!-- Link to your JavaScript file -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

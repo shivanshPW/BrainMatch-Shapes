@@ -438,3 +438,35 @@ h1 {
     font-family: 'Mochiy Pop One', sans-serif;
     font-size: 1.1em;
 }
+
+/* START: Added Peek Timer Styles */
+.peek-timer {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-blocks-container {
+    display: flex;
+    gap: 6px;
+    position: absolute;
+}
+
+.timer-block {
+    width: 40px;
+    height: 25px;
+    background-color: #926565;
+    border-radius: 6px;
+    box-shadow: inset 0 -3px 4px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.timer-block.inactive {
+    transform: scale(0.8);
+    opacity: 0;
+}
+/* END: Added Peek Timer Styles */
